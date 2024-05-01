@@ -1,31 +1,31 @@
 // Importación de las dependencias necesarias
 import { Button, Modal } from "react-bootstrap";
 import * as Yup from "yup";
+
+import { IPersona } from "../../../../types/IPersona";
+import TextFieldValue from "../../TextFildValue/TextFildValue";
 import { Form, Formik } from "formik";
-import TextFieldValue from "../TextFildValue/TextFildValue";
-import { IPersona } from "../../types/IPersona";
-import { PersonaService } from "../../services/PersonaService";
+import { PersonaService } from "../../../../services/PersonaService";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
+import { removeElementActive } from "../../../../redux/slices/TablaReducer";
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Definición de las propiedades que recibe el componente
-interface props {
-  showModal: boolean;
-  handleClose: () => void;
-  editing?: boolean;
-  persona?: IPersona;
-  getPersonas: Function;
+// Interfaz para los props del componente ModalPersona
+interface IModalPersona {
+  getPersonas: Function; // Función para obtener las personas
+  openModal: boolean;
+  setOpenModal: (state: boolean) => void;
 }
 
-// Definición del componente ModalFormulario
-export const ModalFormulario = ({
-  showModal,
-  handleClose,
-  editing,
-  persona,
+// Definición del componente ModalPersona
+export const ModalPersona = ({
   getPersonas,
-}: props) => {
+  openModal,
+  setOpenModal,
+}: IModalPersona) => {
   // Valores iniciales para el formulario
   const initialValues: IPersona = {
+    id: 0,
     phoneNumber: "",
     address: "",
     birthdate: "" as any,
@@ -35,62 +35,77 @@ export const ModalFormulario = ({
   };
 
   // URL de la API obtenida desde las variables de entorno
-
   const actualDate: string = new Date().toISOString().split("T")[0];
-  const personaService = new PersonaService(API_URL + '/personas');
+  const apiPersona = new PersonaService(API_URL + "/personas");
 
-  // Renderizado del componente ModalFormulario
+  const elementActive = useAppSelector(
+    (state) => state.tablaReducer.elementActive
+  );
+  const dispatch = useAppDispatch();
+
+  // Función para cerrar el modal
+  const handleClose = () => {
+    setOpenModal(false);
+    dispatch(removeElementActive());
+  };
+
   return (
     <div>
+      {/* Componente Modal de React Bootstrap */}
       <Modal
         id={"modal"}
-        show={showModal}
+        show={openModal}
         onHide={handleClose}
         size={"lg"}
         backdrop="static"
         keyboard={false}
       >
         <Modal.Header closeButton>
-          {editing ? (
+          {/* Título del modal dependiendo de si se está editando o añadiendo una persona */}
+          {elementActive ? (
             <Modal.Title>Editar una persona:</Modal.Title>
           ) : (
             <Modal.Title>Añadir una persona:</Modal.Title>
           )}
         </Modal.Header>
         <Modal.Body>
+          {/* Componente Formik para el formulario */}
           <Formik
-            validationSchema={
-              Yup.object({
-                phoneNumber: Yup.string().required("Campo requerido"),
-                address: Yup.string().required("Campo requerido"),
-                birthdate: Yup.date().required("Campo requerido").max(actualDate, 'La fecha no puede ser mayor a la fecha actual'),
-                email: Yup.string().email("Tiene que ser un correo electrónico válido").required("Campo requerido"),
-                firstName: Yup.string().required("Campo requerido"),
-                lastName: Yup.string().required("Campo requerido")
-              })
-            }
-            initialValues={persona ? persona : initialValues}
+            validationSchema={Yup.object({
+              phoneNumber: Yup.string().required("Campo requerido"),
+              address: Yup.string().required("Campo requerido"),
+              birthdate: Yup.date()
+                .required("Campo requerido")
+                .max(
+                  actualDate,
+                  "La fecha no puede ser mayor a la fecha actual"
+                ),
+              email: Yup.string()
+                .email("Tiene que ser un correo electrónico válido")
+                .required("Campo requerido"),
+              firstName: Yup.string().required("Campo requerido"),
+              lastName: Yup.string().required("Campo requerido"),
+            })}
+            initialValues={elementActive ? elementActive : initialValues}
             enableReinitialize={true}
-            onSubmit={async (values) => {
-
-              if (editing) {
-                await personaService.put(
-                  persona?.id ?? 0,
-                  values
-                );
+            onSubmit={async (values: IPersona) => {
+              // Enviar los datos al servidor al enviar el formulario
+              if (elementActive) {
+                await apiPersona.put(elementActive?.id, values);
               } else {
-                await personaService.post(
-                  values
-                );
+                await apiPersona.post(values);
               }
+              // Obtener las personas actualizadas y cerrar el modal
               getPersonas();
               handleClose();
             }}
           >
             {() => (
               <>
+                {/* Formulario */}
                 <Form autoComplete="off" className="form-obraAlta">
                   <div className="container_Form_Ingredientes">
+                    {/* Campos del formulario */}
                     <TextFieldValue
                       label="Nombre:"
                       name="firstName"
@@ -130,6 +145,7 @@ export const ModalFormulario = ({
                       placeholder="Fecha de nacimiento"
                     />
                   </div>
+                  {/* Botón para enviar el formulario */}
                   <div className="d-flex justify-content-end">
                     <Button variant="success" type="submit">
                       Enviar
@@ -141,6 +157,6 @@ export const ModalFormulario = ({
           </Formik>
         </Modal.Body>
       </Modal>
-    </div >
-  )
-}
+    </div>
+  );
+};
