@@ -429,13 +429,6 @@
   resolved "https://registry.npmjs.org/@swc/types/-/types-0.1.4.tgz"
   integrity sha512-z/G02d+59gyyUb7KYhKi9jOhicek6QD2oMaotUyG+lUkybpXoV49dY9bj7Ah5Q+y7knK2jU67UTX9FyfGzaxQg==
 
-"@types/jquery@^3.5.20":
-  version "3.5.29"
-  resolved "https://registry.npmjs.org/@types/jquery/-/jquery-3.5.29.tgz"
-  integrity sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==
-  dependencies:
-    "@types/sizzle" "*"
-
 "@types/json-schema@^7.0.12":
   version "7.0.12"
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.12.tgz"
@@ -490,11 +483,6 @@
   version "7.5.0"
   resolved "https://registry.npmjs.org/@types/semver/-/semver-7.5.0.tgz"
   integrity sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==
-
-"@types/sizzle@*":
-  version "2.3.8"
-  resolved "https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.8.tgz"
-  integrity sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==
 
 "@types/warning@^3.0.0":
   version "3.0.0"

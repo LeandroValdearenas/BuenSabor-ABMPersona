@@ -3,15 +3,16 @@ import { Button, Modal } from "react-bootstrap";
 import * as Yup from "yup";
 import { Form, Formik } from "formik";
 import TextFieldValue from "../TextFildValue/TextFildValue";
-import { persona } from "../../types/persona";
-import BackendClient from "../../services/BackEndClient";
+import { IPersona } from "../../types/IPersona";
+import { PersonaService } from "../../services/PersonaService";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Definición de las propiedades que recibe el componente
 interface props {
   showModal: boolean;
   handleClose: () => void;
   editing?: boolean;
-  persona?: persona;
+  persona?: IPersona;
   getPersonas: Function;
 }
 
@@ -24,7 +25,7 @@ export const ModalFormulario = ({
   getPersonas,
 }: props) => {
   // Valores iniciales para el formulario
-  const initialValues: persona = {
+  const initialValues: IPersona = {
     phoneNumber: "",
     address: "",
     birthdate: "" as any,
@@ -36,7 +37,7 @@ export const ModalFormulario = ({
   // URL de la API obtenida desde las variables de entorno
 
   const actualDate: string = new Date().toISOString().split("T")[0];
-  const backendClientPersonas = new BackendClient<persona>('personas');
+  const personaService = new PersonaService(API_URL + '/personas');
 
   // Renderizado del componente ModalFormulario
   return (
@@ -73,12 +74,12 @@ export const ModalFormulario = ({
             onSubmit={async (values) => {
 
               if (editing) {
-                await backendClientPersonas.put(
+                await personaService.put(
                   persona?.id ?? 0,
                   values
                 );
               } else {
-                await backendClientPersonas.post(
+                await personaService.post(
                   values
                 );
               }

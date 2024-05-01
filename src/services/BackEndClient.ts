@@ -1,8 +1,8 @@
 import AbstractBackendClient, { DataModel } from "./AbstractBackEndClient";
 
-class BackendClient<T extends DataModel<T>> extends AbstractBackendClient<T> {
+export abstract class BackendClient<T extends DataModel<T>> extends AbstractBackendClient<T> {
     constructor(baseUrl: string) {
-        super("http://localhost:8080/api/" + baseUrl);
+        super(baseUrl);
     }
 
     async getAll(): Promise<T[]> {
@@ -52,6 +52,3 @@ class BackendClient<T extends DataModel<T>> extends AbstractBackendClient<T> {
         return deletedData as T;
     }
 }
-
-
-export default BackendClient;

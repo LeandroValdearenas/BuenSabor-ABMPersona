@@ -9,10 +9,11 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { persona } from "../../types/persona";
-import BackendClient from "../../services/BackEndClient";
+import { IPersona } from "../../types/IPersona";
+import { PersonaService } from "../../services/PersonaService";
 import { ModalFormulario } from "../ModalFormulario/ModalFormulario";
 import swal from 'sweetalert2'
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Definición de las propiedades que recibe el componente
 interface props {
@@ -23,15 +24,17 @@ interface props {
 export const TablePersonas = (
   { setShowModal, ShowModal }: props
 ) => {
+  // Función para obtener los datos de personas desde la API
+  const personaService = new PersonaService(API_URL + '/personas');
 
   // Estado para controlar la carga de datos
   const [Loading, setLoading] = useState(false);
 
   // Estado para almacenar la lista de personas
-  const [personas, setPersonas] = useState<persona[]>([]);
+  const [personas, setPersonas] = useState<IPersona[]>([]);
 
   // Estado para la edición de una persona
-  const [personaEdit, setPersonaEdit] = useState<persona>();
+  const [personaEdit, setPersonaEdit] = useState<IPersona>();
 
   // Estado para controlar si se está editando
   const [editing, setEditing] = useState(false);
@@ -43,11 +46,9 @@ export const TablePersonas = (
     setPersonaEdit(undefined);
   }
 
-  // Función para obtener los datos de personas desde la API
-  const backendClientPersonas = new BackendClient<persona>('personas');
   async function getDataPersonas() {
     setLoading(true);
-    await backendClientPersonas.getAll()
+    await personaService.getAll()
       .then((personaData) => {
         setPersonas(personaData);
         setLoading(false);
@@ -75,7 +76,7 @@ export const TablePersonas = (
       cancelButtonText: 'Cancelar'
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await backendClientPersonas.delete(id);
+        await personaService.delete(id);
         getDataPersonas();
       }
     });
